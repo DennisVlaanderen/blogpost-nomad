@@ -1,4 +1,4 @@
-# Nomad: multi-region deployments, voor mensen die niet van stress houden
+# Een introductie tot Nomad, een Gids voor Multi-Region Deployments
 
 *Dennis Vlaanderen*, oktober 2023
 <img src="./resources/Nomad_PrimaryLogo_FullColor.png" width="200" align="right">
