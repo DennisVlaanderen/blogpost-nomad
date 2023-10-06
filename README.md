@@ -124,6 +124,8 @@ Deze wordt uitgevoerd in het datacenter `dc1` en is van het type `service`.
 Voor een multi-regionale deployment kan dit aangepast worden naar `batch` of `system`.
 Met de `batch` optie wordt de job uitgevoerd op een node die aan de criteria voldoet.
 Met de `system` optie wordt de job uitgevoerd op alle nodes die aan de criteria voldoen.
+Verder kunnen er ook specifieke datacenters worden opgegeven waar de job op uitgevoerd moet worden door deze toe te voegen aan de `datacenters` lijst.
+
 De `example` job heeft een groep met de naam `example` die 1 keer moet worden uitgevoerd.
 Deze groep heeft een taak met de naam `server` die gebruik maakt van de `docker` driver.
 Deze taak heeft een configuratie met een image en een argument.
@@ -138,14 +140,13 @@ Laten we een diepere duik nemen in de kenmerken van beide systemen, inclusief hu
 ![Data Trap](./resources/data_trap.png)  
 *Figuur 3*: De valkuil van Data-gedreven besluitvorming
 
-| **Functie**                  | **Nomad**                             | **Kubernetes**                       |
+| **Meetpunt**                  | **Nomad**                             | **Kubernetes**                       |
 |------------------------------|----------------------------------------|---------------------------------------|
 | **Complexiteit**             | Eenvoudig en snel in te stellen, met minimale configuratie voor multi-regionale setups. | Complex, met een steile leercurve, maar biedt uitgebreide mogelijkheden voor wereldwijde schaalbaarheid. |
 | **Multi-Regionale Implementatie** | Krachtige mogelijkheden voor wereldwijde deployments, eenvoudige configuratie voor het verdelen van taken over meerdere regio's. | Uitgebreide ondersteuning voor multi-regionale clusters, maar vereist grondige kennis voor optimale configuratie. |
 | **Schaalbaarheid**           | Schaalbaar voor kleinere tot middelgrote implementaties, maar kan naadloos opschalen over meerdere regio's. | Uiterst schaalbaar, speciaal ontworpen voor complexe, grootschalige wereldwijde uitrol. |
 | **Gemeenschap en Ondersteuning** | Kleiner, maar groeiende gemeenschap. | Uitgebreide gemeenschap met talloze bronnen en actieve ondersteuning. |
 | **Onderhoud en Updates**     | Eenvoudiger, met minder complexiteit bij wereldwijde updates en onderhoud. | Updates kunnen complex zijn, vereisen zorgvuldige coördinatie, vooral in multi-regionale scenario's. |
-| **Kosten**                   | Gratis en open source.                  | Gratis en open source.                  |
 | **Ondersteunde deployments** | Containers, VM's.          | Containers, VM's (met plugin).           |
 | **Beheer van secrets**       | Ja, met Vault-integratie.               | Ja, met ingebouwde secrets manager.     |
 
