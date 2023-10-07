@@ -23,18 +23,24 @@ Met deze aanpak kunnen organisaties hun gebruikers bedienen vanuit de dichtstbij
 
 ## Deployen van microservices
 
-Container orchestration is het kloppende hart van moderne softwarearchitectuur. Het biedt een georganiseerd, efficiënt en schaalbaar systeem voor het beheren van containers, de draagbare eenheden waarin applicaties en hun afhankelijkheden zijn verpakt.
-In de complexe wereld van hedendaagse IT, waar flexibiliteit en snelheid essentieel zijn, biedt container orchestration een gestroomlijnde methode om applicaties te implementeren, te schalen en te beheren.
-Door automatisering van cruciale taken zoals load balancing, failover en resourcebeheer, stelt container orchestration teams in staat zich te concentreren op innovatie in plaats van zich zorgen te maken over de operationele complexiteit.
-Het verhoogt niet alleen de operationele efficiëntie maar versnelt ook de ontwikkeltijd, waardoor bedrijven wendbaarder en concurrerender worden in de dynamische digitale markt (Mitra & Nadareishvili*, 2020).
-Daarnaast verbeterd het ook de mogelijkheid tot ophalen van specifieke metrics door opsplitsing van kleine individuele services in plaats van één grote applicatie.
+Container Orchestration is het kloppende hart van moderne softwarearchitectuur. Het biedt een georganiseerd, efficiënt en schaalbaar systeem voor het beheren van containers, de draagbare eenheden waarin applicaties en hun afhankelijkheden zijn verpakt.
+In de complexe wereld van hedendaagse IT, waar flexibiliteit en snelheid essentieel zijn, biedt Container Orchestration een gestroomlijnde methode om applicaties te implementeren, te schalen en te beheren.
+Door automatisering van cruciale taken zoals load balancing, failover en resourcebeheer, stelt Container Orchestration teams in staat zich te concentreren op innovatie in plaats van zich zorgen te maken over de operationele complexiteit.
+Het verhoogt niet alleen de operationele efficiëntie maar versnelt ook de ontwikkeltijd, waardoor bedrijven wendbaarder en concurrerender worden in de dynamische digitale markt (Mitra & Nadareishvili, 2020).
+Daarnaast verbetert het ook de mogelijkheid tot ophalen van specifieke metrics door opsplitsing van kleine individuele services in plaats van één grote applicatie.
 
-![xkcd over Disk Usage](./resources/disk_usage.png)  
-*Figuur 1*: Resource Management in handen van gebruikers
+![xkcd over Containers](./resources/containers.png)  
+*Figuur 1*: Fysieke microservices
 
 ## Bouwstenen van Nomad
 
-Nomad, HashiCorp's veelzijdige orchestratiesysteem, steunt op essentiële elementen voor naadloze multi-region deployments. Met de 'Job Specification' definieer je taken, terwijl 'Nodes' fysieke/virtuele machines vertegenwoordigen waarop taken draaien. 'Regions' beheren geografische afstanden, terwijl 'Schedulers' intelligent taken verdelen onder deze Regions. 'Federation' laat clusters wereldwijd samenwerken, terwijl netwerkintegratie en monitoring cruciaal zijn voor naadloze communicatie en prestatiemonitoring. Nomad biedt ook een robuuste API en CLI voor beheer, wat ontwikkelaars en operators in staat stelt om Nomad-gebaseerde implementaties moeiteloos te beheren, ongeacht hun locatie. Deze bouwstenen vormen de ruggengraat van Nomad's mogelijkheid om complexe wereldwijde implementaties te realiseren.
+Nomad, HashiCorp's veelzijdige orchestratiesysteem, steunt op essentiële elementen voor naadloze multi-region deployments.
+Met de 'Job Specification' definieer je taken, terwijl 'Nodes' fysieke/virtuele machines vertegenwoordigen waarop taken draaien.
+'Regions' beheren geografische afstanden, terwijl 'Schedulers' intelligent taken verdelen onder deze Regions.
+'Federation' laat clusters wereldwijd samenwerken, terwijl netwerkintegratie en monitoring cruciaal zijn voor naadloze communicatie en prestatiemonitoring.
+Nomad biedt ook een robuuste API en CLI voor beheer, wat ontwikkelaars en operators in staat stelt om Nomad-gebaseerde implementaties moeiteloos te beheren, ongeacht hun locatie.
+Deze bouwstenen vormen de ruggengraat van Nomad's mogelijkheid om complexe wereldwijde implementaties te realiseren.
+Dit alles handelt Nomad voor de gebruiker af, waardoor deze zich kan concentreren op het ontwikkelen van innovatieve applicaties en minimale tijd hoeft te besteden aan het beheer van de onderliggende infrastructuur.
 
 ![Basis architectuur nomad](./resources/Nomad_architecture.png)  
 *Figuur 2*: Basis-architectuur Nomad
@@ -70,7 +76,6 @@ Hierbij is `<job.hcl>` het pad naar het bestand dat de job beschrijft. Als er ge
 
 Naast de CLI biedt een Nomad cluster ook een API aan. Deze API kan gebruikt worden om jobs te deployen naar de cluster. Dit kan gedaan worden door een POST request te sturen naar de `/v1/jobs` endpoint van de Nomad server. In dit request moet de job gespecifieerd worden in HCL formaat.
 
-
 ```bash
 curl \
     --request POST \
@@ -81,9 +86,9 @@ curl \
 
 Ook via de API wordt het opgegeven hcl bestand gevalideerd en wordt de job toegevoegd aan de job queue. (*Jobs - HTTP API | Nomad | HashiCorp Developer*, z.d.)
 
-### Deployen van een job
+### Definiëren van een job
 
-Het definieren van een job kan op verschillende manieren. De meest gebruikte manier is via een HCL (HashiCorp Configuration Language) bestand.
+Het definiëren van een job kan op verschillende manieren. De meest gebruikte manier is via een HCL (HashiCorp Configuration Language) bestand.
 Dit is een declaratieve taal die HashiCorp heeft ontwikkeld om configuratiebestanden te schrijven.
 Oorspronkelijk is deze taal ontwikkeld voor Terraform, maar wordt nu ook gebruikt voor andere HashiCorp producten zoals Nomad.
 Een voorbeeld van een HCL bestand is te zien in het codevoorbeeld hieronder. (Hashicorp, z.d.)
@@ -132,6 +137,44 @@ Deze taak heeft een configuratie met een image en een argument.
 Ook heeft deze taak een resource configuratie met een cpu, geheugen en netwerk configuratie.
 Deze configuratie wordt gebruikt om de taak te starten op een node die aan de criteria voldoet.
 
+### Servers toevoegen aan de cluster
+
+Om een Nomad cluster te starten zijn er minstens 3 servers nodig.
+Deze servers kunnen opgestart worden met het volgende commando:
+
+```bash
+nomad agent -server -bootstrap-expect=3
+```
+
+Dit commando start een Nomad server op met de bootstrap verwachting op 3.
+De bootstrap verwachting geeft aan hoeveel servers er minimaal nodig zijn om de cluster te starten.
+Als er minder servers zijn dan de bootstrap verwachting zal de cluster niet starten.
+Als er meer servers zijn dan de bootstrap verwachting zal de cluster starten en de extra servers toevoegen aan de cluster.
+Deze extra servers kunnen gebruikt worden om de cluster te herstellen als er een server uitvalt.
+Als er een server uitvalt zal de cluster blijven werken zolang er nog minstens 3 servers overblijven.
+
+Om aan te gever in welke regio de server zich bevindt kan de `-dc` optie gebruikt worden.
+Deze optie kan meerdere keren gebruikt worden om meerdere regio's op te geven.
+Als er geen regio's worden opgegeven zal de server zich in de `global` regio bevinden.
+
+```bash
+nomad agent -server -bootstrap-expect=3 -dc=dc1 -dc=dc2
+```
+
+Deze regio's kunnen vervolgens gebruikt worden om jobs te deployen naar specifieke regio's via het `datacenters` veld in de job configuratie. (*Commands: Agent | Nomad | HashiCorp Developer*, z.d.)
+
+### Nodes toevoegen aan de cluster
+
+Om een server-node toe te voegen aan het cluster moet deze kenbaar gemaakt worden bij andere servers van het cluster.
+Dit kan gedaan worden met het volgende commando:
+
+```bash
+nomad server join [options] <nomad-server>:4647
+```
+
+Dit commando registreert de huidige server bij de Nomad server op het opgegeven adres `<nomad-server>`.
+De options kunnen worden gebruik om de regio van de server op te geven, maar ook om certificaten te gebruiken voor de communicatie tussen de servers. (*Commands: Server Join | Nomad | HashiCorp Developer*, z.d.)
+
 ## Nomad vs Kubernetes: Wie wordt de dirigent van jouw orkest?
 
 In het dynamische landschap van containerorchestratie staan Nomad en Kubernetes beide in de schijnwerpers, maar welke is de beste keuze voor jouw project, vooral als het aankomt op multi-regionale deployments?
@@ -174,14 +217,18 @@ Hopelijk heeft dit artikel je geholpen om een beter begrip te krijgen van de ver
 ## Bronnen
 
 Goldman, M. (2022, 1 september). 5 reasons to build multi-region application architecture. *Cockroach Labs*.  
-Geraadpleegd op 3 oktober 2023, van https://www.cockroachlabs.com/blog/5-reasons-to-build-multi-region-application-architecture/
+Geraadpleegd op 3 oktober 2023, van <https://www.cockroachlabs.com/blog/5-reasons-to-build-multi-region-application-architecture/>
 
 Mitra, R., & Nadareishvili, I. (2020). Microservices: up and running: A Step-By-Step Guide to Building a Microservice Architecture. O’Reilly Media.
 
-*Introduction to Nomad | Nomad | HashiCorp Developer.* (z.d.). Introduction to Nomad | Nomad | HashiCorp Developer. Geraadpleegd op 4 oktober 2023, van https://developer.hashicorp.com/nomad/tutorials/get-started/gs-overview
+*Introduction to Nomad | Nomad | HashiCorp Developer.* (z.d.). Introduction to Nomad | Nomad | HashiCorp Developer. Geraadpleegd op 4 oktober 2023, van <https://developer.hashicorp.com/nomad/tutorials/get-started/gs-overview>
 
-*Commands: Job Run | Nomad | HashiCorp Developer*. (z.d.). Commands: job run | Nomad | HashiCorp Developer. Geraadpleegd op 6 oktober 2023, van https://developer.hashicorp.com/nomad/docs/commands/job/run
+*Commands: Job Run | Nomad | HashiCorp Developer*. (z.d.). Commands: job run | Nomad | HashiCorp Developer. Geraadpleegd op 6 oktober 2023, van <https://developer.hashicorp.com/nomad/docs/commands/job/run>
 
-Jobs - HTTP API | Nomad | HashiCorp Developer. (z.d.). Jobs - HTTP API | Nomad | HashiCorp Developer. Geraadpleegd op 6 oktober 2023, van https://developer.hashicorp.com/nomad/api-docs/jobs
+Jobs - HTTP API | Nomad | HashiCorp Developer. (z.d.). Jobs - HTTP API | Nomad | HashiCorp Developer. Geraadpleegd op 6 oktober 2023, van <https://developer.hashicorp.com/nomad/api-docs/jobs>
 
-Hashicorp. (z.d.). GitHub - Hashicorp/HCL: HCL is the HashiCorp configuration language. GitHub. Geraadpleegd op 6 oktober 2023, van https://github.com/hashicorp/hcl
+Hashicorp. (z.d.). GitHub - Hashicorp/HCL: HCL is the HashiCorp configuration language. GitHub. Geraadpleegd op 6 oktober 2023, van <https://github.com/hashicorp/hcl>
+
+*Commands: Agent | Nomad | HashiCorp Developer*. (z.d.). Commands: agent | Nomad | HashiCorp Developer. Geraadpleegd op 7 oktober 2023, van <https://developer.hashicorp.com/nomad/docs/commands/agent>
+
+*Commands: Server Join | Nomad | HashiCorp Developer*. (z.d.). Commands: server join | Nomad | HashiCorp Developer. Geraadpleegd op 7 oktober 2023, van <https://developer.hashicorp.com/nomad/docs/commands/server/join>
